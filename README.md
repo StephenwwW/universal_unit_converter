@@ -32,7 +32,7 @@ A comprehensive, multi-lingual unit conversion tool built with HTML, CSS, and Ja
 
 **2. Clone the Repository**
 ```bash
-git clone [https://github.com/YOUR_USERNAME/universal-unit-converter.git](https://github.com/StephenwwW/universal_unit_converter.git)
+git clone https://github.com/StephenwwW/universal_unit_converter.git
 cd universal-unit-converter
 ````
 
@@ -91,7 +91,7 @@ This project is released under the [MIT License](LICENSE).
 **2. 複製專案**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/universal-unit-converter.git
+git clone https://github.com/StephenwwW/universal_unit_converter.git
 cd universal-unit-converter
 ```
 
