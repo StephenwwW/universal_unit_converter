@@ -22,7 +22,7 @@ A comprehensive, multi-lingual unit conversion tool built with HTML, CSS, and Ja
 
 ![Screenshot](images/screenshot.png)  
 
-![Application Demo GIF](images/usage-demo.gif)
+![Application Demo GIF](images/usage_demo.gif)
 
 ### Setup & Installation
 
@@ -80,7 +80,7 @@ This project is released under the [MIT License](LICENSE).
 
 ![軟體截圖](images/screenshot.png)
 
-![操作程式 GIF 動畫](images/usage-demo.gif)
+![操作程式 GIF 動畫](images/usage_demo.gif)
 
 ### 環境設定與安裝
 
