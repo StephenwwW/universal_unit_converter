@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="page_title">通用單位轉換器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2em 1em;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .converter-container {
+            background-color: #ffffff;
+            padding: 2.5em;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+        }
+        .lang-switcher {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5em;
+        }
+        .lang-switcher button {
+            background: none;
+            border: 1px solid #ccc;            
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            width: 100px; 
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+        }
+        .lang-switcher button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 5px;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 1.5em;
+        }
+        .tabs button {
+            padding: 0.8em 0.2em;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color 0.3s, border-color 0.3s;
+            white-space: nowrap;
+        }
+        .tabs button.active {
+            color: #007bff;
+            border-color: #007bff;
+            font-weight: 600;
+        }
+        .converter-panel { display: none; }
+        .converter-panel.active { display: block; }
+        h1 { color: #2c3e50; margin-bottom: 1em; margin-top: 0; text-align: center; }
+        h2 { font-size: 1.1em; font-weight: 600; color: #007bff; margin-top: 0; margin-bottom: 1em; border-bottom: 2px solid #007bff; padding-bottom: 0.5em; text-align: center; }
+        h3.unit-system-title { font-size: 0.9em; font-weight: 500; color: #6c757d; margin-top: 2em; margin-bottom: 0.5em; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        .input-group { margin-bottom: 1.5em; }
+        .dimension-input-wrapper { display: flex; gap: 10px; }
+        .dimension-input-wrapper input { flex-grow: 1; }
+        label { display: block; margin-bottom: 0.5em; font-weight: 500; color: #555; }
+        input[type="number"], select { width: 100%; padding: 0.8em; border: 1px solid #ccc; border-radius: 5px; font-size: 1.1em; box-sizing: border-box; transition: border-color 0.3s; }
+        select { font-size: 1em; background-color: #fff; }
+        input[type="number"]:focus, select:focus { outline: none; border-color: #007bff; }
+        hr { border: none; border-top: 1px solid #eee; margin: 2.5em 0; }
+        .clear-button { width: 100%; padding: 0.9em; background-color: #dc3545; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s; margin-top: 1em; }
+        .clear-button:hover { background-color: #c82333; }
+    </style>
+</head>
+<body>
+
+    <div class="converter-container">
+        <div class="lang-switcher">
+            <button id="lang-zh-TW" class="active" onclick="changeLanguage('zh-TW')">繁體中文</button>
+            <button id="lang-en" onclick="changeLanguage('en')">English</button>
+            <button id="lang-ja" onclick="changeLanguage('ja')">日本語</button>
+        </div>
+
+        <h1 data-lang-key="main_title">通用單位轉換器</h1>
+
+        <div class="tabs">
+            <button class="active" onclick="showPanel('area')" data-lang-key="tab_area">面積</button>
+            <button onclick="showPanel('length')" data-lang-key="tab_length">長度</button>
+            <button onclick="showPanel('weight')" data-lang-key="tab_weight">重量</button>
+            <button onclick="showPanel('volume')" data-lang-key="tab_volume">體積</button>
+            <button onclick="showPanel('temperature')" data-lang-key="tab_temperature">溫度</button>
+            <button onclick="showPanel('speed')" data-lang-key="tab_speed">速度</button>
+            <button onclick="showPanel('fuel')" data-lang-key="tab_fuel">燃油效率</button>
+            <button onclick="showPanel('pressure')" data-lang-key="tab_pressure">壓力</button>
+            <button onclick="showPanel('power')" data-lang-key="tab_power">功率</button>
+            <button onclick="showPanel('energy')" data-lang-key="tab_energy">能量</button>
+        </div>
+
+        <!-- 面積轉換器 -->
+        <div id="area-converter" class="converter-panel active">
+            <h2 data-lang-key="mode1_title">模式一：依尺寸計算</h2>
+            <div class="input-group">
+                <label for="length" data-lang-key="length_label">長</label>
+                <div class="dimension-input-wrapper">
+                    <input type="number" id="length" step="0.01" data-lang-key-placeholder="length_placeholder">
+                    <select id="lengthUnit">
+                        <option value="meter" data-lang-key="unit_meter">公尺</option>
+                        <option value="tai-chi" data-lang-key="unit_tai_chi">台尺</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="width" data-lang-key="width_label">寬</label>
+                <div class="dimension-input-wrapper">
+                    <input type="number" id="width" step="0.01" data-lang-key-placeholder="width_placeholder">
+                    <select id="widthUnit">
+                        <option value="meter" data-lang-key="unit_meter">公尺</option>
+                        <option value="tai-chi" data-lang-key="unit_tai_chi">台尺</option>
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <h2 data-lang-key="mode2_title">模式二：直接單位換算</h2>
+            <div class="input-group">
+                <label for="sqm" data-lang-key="sqm_label">平方米 (m²)</label>
+                <input type="number" id="sqm" data-lang-key-placeholder="sqm_placeholder">
+            </div>
+            <div class="input-group">
+                <label for="ping" data-lang-key="ping_label">坪</label>
+                <input type="number" id="ping" data-lang-key-placeholder="ping_placeholder">
+            </div>
+        </div>
+
+        <!-- 長度轉換器 -->
+        <div id="length-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_cm">公分 (cm)</label><input type="number" id="length-cm"></div>
+            <div class="input-group"><label data-lang-key="unit_meter_full">公尺 (m)</label><input type="number" id="length-m"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_inch">英吋 (in)</label><input type="number" id="length-in"></div>
+            <div class="input-group"><label data-lang-key="unit_feet">英呎 (ft)</label><input type="number" id="length-ft"></div>
+        </div>
+
+        <!-- 重量轉換器 -->
+        <div id="weight-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_g">公克 (g)</label><input type="number" id="weight-g"></div>
+            <div class="input-group"><label data-lang-key="unit_kg">公斤 (kg)</label><input type="number" id="weight-kg"></div>
+            <h3 class="unit-system-title" data-lang-key="system_taiwanese">台制</h3>
+            <div class="input-group"><label data-lang-key="unit_tw_catty">台斤</label><input type="number" id="weight-tw-catty"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_lb">磅 (lb)</label><input type="number" id="weight-lb"></div>
+            <div class="input-group"><label data-lang-key="unit_oz">盎司 (oz)</label><input type="number" id="weight-oz"></div>
+        </div>
+
+        <!-- 體積轉換器 -->
+        <div id="volume-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_ml">毫升/公撮 (mL)</label><input type="number" id="volume-ml"></div>
+            <div class="input-group"><label data-lang-key="unit_l">公升 (L)</label><input type="number" id="volume-l"></div>
+            <div class="input-group"><label data-lang-key="unit_m3">立方公尺 (m³)</label><input type="number" id="volume-m3"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_gal">加侖 (gal)</label><input type="number" id="volume-gal"></div>
+        </div>
+        
+        <!-- 溫度 -->
+        <div id="temperature-converter" class="converter-panel">
+            <div class="input-group"><label data-lang-key="unit_celsius">攝氏 (°C)</label><input type="number" id="temp-c"></div>
+            <div class="input-group"><label data-lang-key="unit_fahrenheit">華氏 (°F)</label><input type="number" id="temp-f"></div>
+            <div class="input-group"><label data-lang-key="unit_kelvin">克氏/絕對溫度 (K)</label><input type="number" id="temp-k"></div>
+        </div>
+        
+        <!-- 速度 -->
+        <div id="speed-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_kph">公里/小時 (km/h)</label><input type="number" id="speed-kph"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_mph">英里/小時 (mph)</label><input type="number" id="speed-mph"></div>
+        </div>
+
+        <!-- 燃油效率 -->
+        <div id="fuel-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_kml">公里/公升 (km/L)</label><input type="number" id="fuel-kml"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_mpg">英里/加侖 (mpg)</label><input type="number" id="fuel-mpg"></div>
+        </div>
+
+        <!-- 壓力 -->
+        <div id="pressure-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_pa">帕斯卡 (Pa)</label><input type="number" id="pressure-pa"></div>
+            <div class="input-group"><label data-lang-key="unit_hpa">百帕 (hPa)</label><input type="number" id="pressure-hpa"></div>
+            <div class="input-group"><label data-lang-key="unit_bar">巴 (bar)</label><input type="number" id="pressure-bar"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_psi">磅/平方英寸 (psi)</label><input type="number" id="pressure-psi"></div>
+        </div>
+
+        <!-- 功率 -->
+        <div id="power-converter" class="converter-panel">
+            <h3 class="unit-system-title" data-lang-key="system_metric">公制</h3>
+            <div class="input-group"><label data-lang-key="unit_w">瓦特 (W)</label><input type="number" id="power-w"></div>
+            <div class="input-group"><label data-lang-key="unit_kw">千瓦 (kW)</label><input type="number" id="power-kw"></div>
+            <h3 class="unit-system-title" data-lang-key="system_imperial">英制</h3>
+            <div class="input-group"><label data-lang-key="unit_hp">馬力 (hp)</label><input type="number" id="power-hp"></div>
+        </div>
+
+        <!-- 能量 -->
+        <div id="energy-converter" class="converter-panel">
+            <div class="input-group"><label data-lang-key="unit_j">焦耳 (J)</label><input type="number" id="energy-j"></div>
+            <div class="input-group"><label data-lang-key="unit_cal">卡路里 (cal)</label><input type="number" id="energy-cal"></div>
+            <div class="input-group"><label data-lang-key="unit_kcal">千卡/大卡 (kcal)</label><input type="number" id="energy-kcal"></div>
+            <div class="input-group"><label data-lang-key="unit_kwh">千瓦·時 (kWh)</label><input type="number" id="energy-kwh"></div>
+        </div>
+
+        <button class="clear-button" onclick="clearAllInputs()" data-lang-key="clear_button">全部清除</button>
+    </div>
+
+    <script>
+        // --- 語言翻譯物件 (維持不變) ---
+        const translations = {
+            'zh-TW': {
+                page_title: '通用單位轉換器', main_title: '通用單位轉換器', tab_area: '面積', tab_length: '長度', tab_weight: '重量', tab_volume: '體積', tab_temperature: '溫度', tab_speed: '速度', tab_fuel: '燃油效率', tab_pressure: '壓力', tab_power: '功率', tab_energy: '能量',
+                mode1_title: '模式一：依尺寸計算', length_label: '長', width_label: '寬', length_placeholder: '請輸入長度', width_placeholder: '請輸入寬度',
+                unit_meter: '公尺', unit_tai_chi: '台尺', mode2_title: '模式二：直接單位換算', sqm_label: '平方米 (m²)', ping_label: '坪',
+                sqm_placeholder: '輸入平方米或由上方計算', ping_placeholder: '輸入坪數或由上方計算', clear_button: '全部清除',
+                system_metric: '公制', system_imperial: '英制', system_taiwanese: '台制',
+                unit_cm: '公分 (cm)', unit_meter_full: '公尺 (m)', unit_inch: '英吋 (in)', unit_feet: '英呎 (ft)',
+                unit_g: '公克 (g)', unit_kg: '公斤 (kg)', unit_tw_catty: '台斤', unit_lb: '磅 (lb)', unit_oz: '盎司 (oz)',
+                unit_ml: '毫升/公撮 (mL)', unit_l: '公升 (L)', unit_m3: '立方公尺 (m³)', unit_gal: '加侖 (gal)',
+                unit_celsius: '攝氏 (°C)', unit_fahrenheit: '華氏 (°F)', unit_kelvin: '克氏/絕對溫度 (K)',
+                unit_kph: '公里/小時 (km/h)', unit_mph: '英里/小時 (mph)',
+                unit_kml: '公里/公升 (km/L)', unit_mpg: '英里/加侖 (mpg)',
+                unit_pa: '帕斯卡 (Pa)', unit_hpa: '百帕 (hPa)', unit_bar: '巴 (bar)', unit_psi: '磅/平方英寸 (psi)',
+                unit_w: '瓦特 (W)', unit_kw: '千瓦 (kW)', unit_hp: '馬力 (hp)',
+                unit_j: '焦耳 (J)', unit_cal: '卡路里 (cal)', unit_kcal: '千卡/大卡 (kcal)', unit_kwh: '千瓦·時 (kWh)'
+            },
+            'en': {
+                page_title: 'Universal Unit Converter', main_title: 'Universal Unit Converter', tab_area: 'Area', tab_length: 'Length', tab_weight: 'Weight', tab_volume: 'Volume', tab_temperature: 'Temperature', tab_speed: 'Speed', tab_fuel: 'Fuel Economy', tab_pressure: 'Pressure', tab_power: 'Power', tab_energy: 'Energy',
+                mode1_title: 'Mode 1: Calculate from Dimensions', length_label: 'Length', width_label: 'Width', length_placeholder: 'Enter length', width_placeholder: 'Enter width',
+                unit_meter: 'Meter', unit_tai_chi: 'Taiwanese Foot', mode2_title: 'Mode 2: Direct Unit Conversion', sqm_label: 'Square Meters (m²)', ping_label: 'Ping',
+                sqm_placeholder: 'Calculated or enter value', ping_placeholder: 'Calculated or enter value', clear_button: 'Clear All',
+                system_metric: 'Metric', system_imperial: 'Imperial', system_taiwanese: 'Taiwanese',
+                unit_cm: 'Centimeter (cm)', unit_meter_full: 'Meter (m)', unit_inch: 'Inch (in)', unit_feet: 'Foot (ft)',
+                unit_g: 'Gram (g)', unit_kg: 'Kilogram (kg)', unit_tw_catty: 'Taiwanese Catty', unit_lb: 'Pound (lb)', unit_oz: 'Ounce (oz)',
+                unit_ml: 'Milliliter (mL)', unit_l: 'Liter (L)', unit_m3: 'Cubic Meter (m³)', unit_gal: 'Gallon (US)',
+                unit_celsius: 'Celsius (°C)', unit_fahrenheit: 'Fahrenheit (°F)', unit_kelvin: 'Kelvin (K)',
+                unit_kph: 'Kilometers/hour (km/h)', unit_mph: 'Miles/hour (mph)',
+                unit_kml: 'Kilometers/liter (km/L)', unit_mpg: 'Miles/gallon (mpg)',
+                unit_pa: 'Pascal (Pa)', unit_hpa: 'Hectopascal (hPa)', unit_bar: 'Bar (bar)', unit_psi: 'Pounds/sq inch (psi)',
+                unit_w: 'Watt (W)', unit_kw: 'Kilowatt (kW)', unit_hp: 'Horsepower (hp)',
+                unit_j: 'Joule (J)', unit_cal: 'Calorie (cal)', unit_kcal: 'Kilocalorie (kcal)', unit_kwh: 'Kilowatt-hour (kWh)'
+            },
+            'ja': {
+                page_title: '汎用単位換算機', main_title: '汎用単位換算機', tab_area: '面積', tab_length: '長さ', tab_weight: '重量', tab_volume: '体積', tab_temperature: '温度', tab_speed: '速度', tab_fuel: '燃費', tab_pressure: '圧力', tab_power: '仕事率', tab_energy: 'エネルギー',
+                mode1_title: 'モード1：寸法から計算', length_label: '長さ', width_label: '幅', length_placeholder: '長さを入力', width_placeholder: '幅を入力',
+                unit_meter: 'メートル', unit_tai_chi: '台湾尺', mode2_title: 'モード2：単位直接変換', sqm_label: '平方メートル (m²)', ping_label: '坪',
+                sqm_placeholder: '計算結果・または値を入力', ping_placeholder: '計算結果・または値を入力', clear_button: 'すべてクリア',
+                system_metric: 'メートル法', system_imperial: 'ヤード・ポンド法', system_taiwanese: '台湾単位',
+                unit_cm: 'センチメートル (cm)', unit_meter_full: 'メートル (m)', unit_inch: 'インチ (in)', unit_feet: 'フィート (ft)',
+                unit_g: 'グラム (g)', unit_kg: 'キログラム (kg)', unit_tw_catty: '台湾斤', unit_lb: 'ポンド (lb)', unit_oz: 'オンス (oz)',
+                unit_ml: 'ミリリットル (mL)', unit_l: 'リットル (L)', unit_m3: '立方メートル (m³)', unit_gal: 'ガロン (米)',
+                unit_celsius: '摂氏 (°C)', unit_fahrenheit: '華氏 (°F)', unit_kelvin: 'ケルビン (K)',
+                unit_kph: '時速 (km/h)', unit_mph: 'マイル毎時 (mph)',
+                unit_kml: 'キロメートル/リットル (km/L)', unit_mpg: 'マイル/ガロン (mpg)',
+                unit_pa: 'パスカル (Pa)', unit_hpa: 'ヘクトパスカル (hPa)', unit_bar: 'バール (bar)', unit_psi: 'ポンド/平方インチ (psi)',
+                unit_w: 'ワット (W)', unit_kw: 'キロワット (kW)', unit_hp: '馬力 (hp)',
+                unit_j: 'ジュール (J)', unit_cal: 'カロリー (cal)', unit_kcal: 'キロカロリー (kcal)', unit_kwh: 'キロワット時 (kWh)'
+            }
+        };
+
+        const converterConfigs = {
+            length: {
+                baseUnit: 'cm',
+                units: {
+                    cm:   { toBase: v => v, fromBase: v => v, precision: 4 },
+                    m:    { toBase: v => v * 100, fromBase: v => v / 100, precision: 4 },
+                    inch: { toBase: v => v * 2.54, fromBase: v => v / 2.54, precision: 4 },
+                    ft:   { toBase: v => v * 30.48, fromBase: v => v / 30.48, precision: 4 }
+                }
+            },
+            weight: {
+                baseUnit: 'g',
+                units: {
+                    g:       { toBase: v => v, fromBase: v => v, precision: 4 },
+                    kg:      { toBase: v => v * 1000, fromBase: v => v / 1000, precision: 4 },
+                    twCatty: { toBase: v => v * 600, fromBase: v => v / 600, precision: 4 },
+                    lb:      { toBase: v => v * 453.592, fromBase: v => v / 453.592, precision: 4 },
+                    oz:      { toBase: v => v * 28.3495, fromBase: v => v / 28.3495, precision: 4 }
+                }
+            },
+            volume: {
+                baseUnit: 'ml',
+                units: {
+                    ml:  { toBase: v => v, fromBase: v => v, precision: 4 },
+                    l:   { toBase: v => v * 1000, fromBase: v => v / 1000, precision: 4 },
+                    m3:  { toBase: v => v * 1000000, fromBase: v => v / 1000000, precision: 6 },
+                    gal: { toBase: v => v * 3785.41, fromBase: v => v / 3785.41, precision: 4 }
+                }
+            },
+            temp: {
+                baseUnit: 'c',
+                units: {
+                    c: { toBase: v => v, fromBase: v => v, precision: 2 },
+                    f: { toBase: v => (v - 32) * 5/9, fromBase: v => v * 9/5 + 32, precision: 2 },
+                    k: { toBase: v => v - 273.15, fromBase: v => v + 273.15, precision: 2 }
+                }
+            },
+            speed: {
+                baseUnit: 'kph',
+                units: {
+                    kph: { toBase: v => v, fromBase: v => v, precision: 4 },
+                    mph: { toBase: v => v * 1.60934, fromBase: v => v / 1.60934, precision: 4 }
+                }
+            },
+            fuel: {
+                baseUnit: 'kml',
+                units: {
+                    kml: { toBase: v => v, fromBase: v => v, precision: 4 },
+                    mpg: { toBase: v => v * 0.425144, fromBase: v => v / 0.425144, precision: 4 }
+                }
+            },
+            pressure: {
+                baseUnit: 'pa',
+                units: {
+                    pa:  { toBase: v => v, fromBase: v => v, precision: 2 },
+                    hpa: { toBase: v => v * 100, fromBase: v => v / 100, precision: 4 },
+                    bar: { toBase: v => v * 100000, fromBase: v => v / 100000, precision: 6 },
+                    psi: { toBase: v => v * 6894.76, fromBase: v => v / 6894.76, precision: 4 }
+                }
+            },
+            power: {
+                baseUnit: 'w',
+                units: {
+                    w:  { toBase: v => v, fromBase: v => v, precision: 2 },
+                    kw: { toBase: v => v * 1000, fromBase: v => v / 1000, precision: 4 },
+                    hp: { toBase: v => v * 745.7, fromBase: v => v / 745.7, precision: 4 }
+                }
+            },
+            energy: {
+                baseUnit: 'j',
+                units: {
+                    j:    { toBase: v => v, fromBase: v => v, format: 'exp', precision: 4 },
+                    cal:  { toBase: v => v * 4.184, fromBase: v => v / 4.184, format: 'exp', precision: 4 },
+                    kcal: { toBase: v => v * 4184, fromBase: v => v / 4184, format: 'exp', precision: 4 },
+                    kwh:  { toBase: v => v * 3600000, fromBase: v => v / 3600000, precision: 6 }
+                }
+            }
+        };
+
+        const AREA_CONSTANTS = {
+            SQM_TO_PING: 0.3025,
+            PING_TO_SQM: 3.30579,
+            TAI_CHI_TO_METER: 0.30303,
+        };
+
+        // --- 取得所有元素 ---
+        const els = {
+            area: { length: document.getElementById('length'), width: document.getElementById('width'), lengthUnit: document.getElementById('lengthUnit'), widthUnit: document.getElementById('widthUnit'), sqm: document.getElementById('sqm'), ping: document.getElementById('ping') },
+            length: { cm: document.getElementById('length-cm'), m: document.getElementById('length-m'), inch: document.getElementById('length-in'), ft: document.getElementById('length-ft') },
+            weight: { g: document.getElementById('weight-g'), kg: document.getElementById('weight-kg'), twCatty: document.getElementById('weight-tw-catty'), lb: document.getElementById('weight-lb'), oz: document.getElementById('weight-oz') },
+            volume: { ml: document.getElementById('volume-ml'), l: document.getElementById('volume-l'), m3: document.getElementById('volume-m3'), gal: document.getElementById('volume-gal') },
+            temp: { c: document.getElementById('temp-c'), f: document.getElementById('temp-f'), k: document.getElementById('temp-k') },
+            speed: { kph: document.getElementById('speed-kph'), mph: document.getElementById('speed-mph') },
+            fuel: { kml: document.getElementById('fuel-kml'), mpg: document.getElementById('fuel-mpg') },
+            pressure: { pa: document.getElementById('pressure-pa'), hpa: document.getElementById('pressure-hpa'), bar: document.getElementById('pressure-bar'), psi: document.getElementById('pressure-psi') },
+            power: { w: document.getElementById('power-w'), kw: document.getElementById('power-kw'), hp: document.getElementById('power-hp') },
+            energy: { j: document.getElementById('energy-j'), cal: document.getElementById('energy-cal'), kcal: document.getElementById('energy-kcal'), kwh: document.getElementById('energy-kwh') }
+        };
+        const langButtons = document.querySelectorAll('.lang-switcher button');
+        const panels = document.querySelectorAll('.converter-panel');
+        const tabs = document.querySelectorAll('.tabs button');
+
+        // --- 面積轉換器的專屬邏輯 (維持獨立) ---
+        els.area.length.addEventListener('input', calculateFromDimensions);
+        els.area.width.addEventListener('input', calculateFromDimensions);
+        els.area.lengthUnit.addEventListener('change', calculateFromDimensions);
+        els.area.widthUnit.addEventListener('change', calculateFromDimensions);
+        els.area.sqm.addEventListener('input', () => { if (document.activeElement === els.area.sqm) clearDimensions(); convertFromSqm(); });
+        els.area.ping.addEventListener('input', () => { if (document.activeElement === els.area.ping) clearDimensions(); convertFromPing(); });
+
+        function calculateFromDimensions() {
+            let l = parseFloat(els.area.length.value), w = parseFloat(els.area.width.value);
+            if (els.area.lengthUnit.value === 'tai-chi') l *= AREA_CONSTANTS.TAI_CHI_TO_METER;
+            if (els.area.widthUnit.value === 'tai-chi') w *= AREA_CONSTANTS.TAI_CHI_TO_METER;
+            if (!isNaN(l) && !isNaN(w) && l > 0 && w > 0) {
+                const sqm = l * w;
+                els.area.sqm.value = sqm.toFixed(4);
+                els.area.ping.value = (sqm * AREA_CONSTANTS.SQM_TO_PING).toFixed(4);
+            } else {
+                els.area.sqm.value = '';
+                els.area.ping.value = '';
+            }
+        }
+        function convertFromSqm() { const v = parseFloat(els.area.sqm.value); els.area.ping.value = !isNaN(v) ? (v * AREA_CONSTANTS.SQM_TO_PING).toFixed(4) : ''; }
+        function convertFromPing() { const v = parseFloat(els.area.ping.value); els.area.sqm.value = !isNaN(v) ? (v * AREA_CONSTANTS.PING_TO_SQM).toFixed(4) : ''; }
+        function clearDimensions() { els.area.length.value = ''; els.area.width.value = ''; }
+
+        // --- 通用的核心更新函式 ---
+        function updateGeneric(type, sourceUnit, value) {
+            const config = converterConfigs[type];
+            const inputs = els[type];
+            const parsedValue = parseFloat(value);
+
+            if (isNaN(parsedValue)) {
+                return clearInputs(type);
+            }
+
+            const baseValue = config.units[sourceUnit].toBase(parsedValue);
+
+            Object.keys(config.units).forEach(unitKey => {
+                if (unitKey !== sourceUnit) {
+                    const unitConfig = config.units[unitKey];
+                    const resultValue = unitConfig.fromBase(baseValue);
+                    
+                    let formattedValue;
+                    if (unitConfig.format === 'exp') {
+                        formattedValue = resultValue.toExponential(unitConfig.precision);
+                    } else {
+                        formattedValue = resultValue.toFixed(unitConfig.precision);
+                    }
+                    inputs[unitKey].value = formattedValue;
+                }
+            });
+        }
+
+        // --- 自動化綁定所有事件監聽器 ---
+        Object.keys(converterConfigs).forEach(type => {
+            if (els[type]) {
+                Object.keys(els[type]).forEach(unit => {
+                    if (els[type][unit] && els[type][unit].addEventListener) {
+                        els[type][unit].addEventListener('input', () => {
+                            updateGeneric(type, unit, els[type][unit].value);
+                        });
+                    }
+                });
+            }
+        });
+
+        // --- 清除與介面控制 ---
+        function clearInputs(type) { if(els[type]) Object.values(els[type]).forEach(input => { if(input.nodeName === 'INPUT') input.value = ''; }); }
+        function clearAllInputs() { clearDimensions(); Object.keys(els).forEach(key => clearInputs(key)); els.area.lengthUnit.value = 'meter'; els.area.widthUnit.value = 'meter'; }
+        function showPanel(panelId) { panels.forEach(p => p.classList.remove('active')); document.getElementById(`${panelId}-converter`).classList.add('active'); tabs.forEach(t => t.classList.remove('active')); document.querySelector(`[onclick="showPanel('${panelId}')"]`).classList.add('active'); }
+        function changeLanguage(lang) { document.documentElement.lang = lang; document.querySelectorAll('[data-lang-key]').forEach(el => { const key = el.getAttribute('data-lang-key'); if (translations[lang][key]) el.textContent = translations[lang][key]; }); document.querySelectorAll('[data-lang-key-placeholder]').forEach(el => { const key = el.getAttribute('data-lang-key-placeholder'); if (translations[lang][key]) el.placeholder = translations[lang][key]; }); document.title = translations[lang]['page_title']; langButtons.forEach(button => button.classList.remove('active')); document.getElementById(`lang-${lang}`).classList.add('active'); }
+        
+        // 初始載入
+        changeLanguage('zh-TW');
+        showPanel('area');
+    </script>
+</body>
+</html>
+
