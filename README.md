@@ -64,7 +64,7 @@ This project is released under the [MIT License](LICENSE).
 
 ---
 
-[View this document in English](#universal-unit-converter)
+[View this document in English](#english)
 
 ### 功能特色
 
