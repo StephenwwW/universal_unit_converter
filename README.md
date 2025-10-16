@@ -33,7 +33,7 @@ A comprehensive, multi-lingual unit conversion tool built with HTML, CSS, and Ja
 **2. Clone the Repository**
 ```bash
 git clone https://github.com/StephenwwW/universal_unit_converter.git
-cd universal-unit-converter
+cd universal_unit_converter
 ````
 
 **3. Install Dependencies**
@@ -92,7 +92,7 @@ This project is released under the [MIT License](LICENSE).
 
 ```bash
 git clone https://github.com/StephenwwW/universal_unit_converter.git
-cd universal-unit-converter
+cd universal_unit_converter
 ```
 
 **3. 安裝依賴套件**
