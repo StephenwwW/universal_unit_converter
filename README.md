@@ -20,8 +20,6 @@ A comprehensive, multi-lingual unit conversion tool built with HTML, CSS, and Ja
 
 ### User Interface
 
-![Screenshot](images/screenshot.png)  
-
 ![Application Demo GIF](images/usage_demo.gif)
 
 ### Setup & Installation
@@ -77,8 +75,6 @@ This project is released under the [MIT License](LICENSE).
 * **無外部依賴**: 單一、獨立的 HTML 檔案，可在任何現代網頁瀏覽器中運行。
 
 ### 軟體截圖
-
-![軟體截圖](images/screenshot.png)
 
 ![操作程式 GIF 動畫](images/usage_demo.gif)
 
