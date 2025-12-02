@@ -22,6 +22,8 @@ A comprehensive, multi-lingual unit conversion tool built with HTML, CSS, and Ja
 
 ![Application Demo GIF](images/usage_demo.gif)
 
+<img width="423" height="404" alt="screen" src="https://github.com/user-attachments/assets/f83cb015-ff2d-4730-876e-c19aec62fc00" />
+
 ### Setup & Installation
 
 **1. Prerequisites**
@@ -77,10 +79,6 @@ This project is released under the [MIT License](LICENSE).
 ### 軟體截圖
 
 ![操作程式 GIF 動畫](images/usage_demo.gif)
-
-<img width="423" height="404" alt="screen" src="https://github.com/user-attachments/assets/f83cb015-ff2d-4730-876e-c19aec62fc00" />
-
-
 
 ### 環境設定與安裝
 
